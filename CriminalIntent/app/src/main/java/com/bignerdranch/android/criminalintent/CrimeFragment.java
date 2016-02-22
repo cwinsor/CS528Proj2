@@ -27,7 +27,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
@@ -40,14 +42,17 @@ public class CrimeFragment extends Fragment {
     private static final int REQUEST_PHOTO= 2;
 
     private Crime mCrime;
-    private File mPhotoFile;
+    private List<File> mPhotoFileList;
+    private Integer currentPhotoNum = 2;
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckbox;
     private Button mReportButton;
     private Button mSuspectButton;
     private ImageButton mPhotoButton;
-    private ImageView mPhotoView;
+    private final Intent imageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+    private List<ImageView> mPhotoViewList;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         Bundle args = new Bundle();
@@ -63,7 +68,12 @@ public class CrimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
-        mPhotoFile = CrimeLab.get(getActivity()).getPhotoFile(mCrime);
+
+        mPhotoFileList = new ArrayList<File>();
+        mPhotoFileList.add(0, CrimeLab.get(getActivity()).getPhotoFile(mCrime, 0));
+        mPhotoFileList.add(1, CrimeLab.get(getActivity()).getPhotoFile(mCrime, 1));
+        mPhotoFileList.add(2, CrimeLab.get(getActivity()).getPhotoFile(mCrime, 2));
+        mPhotoFileList.add(3, CrimeLab.get(getActivity()).getPhotoFile(mCrime, 3));
     }
 
     @Override
@@ -154,28 +164,40 @@ public class CrimeFragment extends Fragment {
         }
 
         mPhotoButton = (ImageButton) v.findViewById(R.id.crime_camera);
-        final Intent captureImage = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-        boolean canTakePhoto = mPhotoFile != null &&
-                captureImage.resolveActivity(packageManager) != null;
+
+        boolean canTakePhoto =
+                (mPhotoFileList.get(0) != null) &&
+                        (mPhotoFileList.get(1) != null) &&
+                        (mPhotoFileList.get(2) != null) &&
+                        (mPhotoFileList.get(3) != null) &&
+                        imageIntent.resolveActivity(packageManager) != null;
         mPhotoButton.setEnabled(canTakePhoto);
 
         if (canTakePhoto) {
-            Uri uri = Uri.fromFile(mPhotoFile);
-            captureImage.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+            targetThePhotoIntent();
         }
 
         mPhotoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(captureImage, REQUEST_PHOTO);
+                startActivityForResult(imageIntent, REQUEST_PHOTO);
             }
         });
 
-        mPhotoView = (ImageView) v.findViewById(R.id.crime_photo);
-        updatePhotoView();
+        mPhotoViewList = new ArrayList<ImageView>();
+        mPhotoViewList.add(0, (ImageView) v.findViewById( R.id.crime_photo_0));
+        mPhotoViewList.add(1, (ImageView) v.findViewById( R.id.crime_photo_1));
+        mPhotoViewList.add(2, (ImageView) v.findViewById( R.id.crime_photo_2));
+        mPhotoViewList.add(3, (ImageView) v.findViewById( R.id.crime_photo_3));
+        initialPhotoView();
 
         return v;
+    }
+
+    private void targetThePhotoIntent() {
+        Uri uri = Uri.fromFile(mPhotoFileList.get(currentPhotoNum));
+        imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
     }
 
     @Override
@@ -219,7 +241,12 @@ public class CrimeFragment extends Fragment {
                 c.close();
             }
         } else if (requestCode == REQUEST_PHOTO) {
-            updatePhotoView();
+            updatePhotoView(currentPhotoNum);
+
+// point intent to the next photo
+            currentPhotoNum = (currentPhotoNum + 1) % getActivity().getResources().getInteger(R.integer.num_pics);
+            targetThePhotoIntent();
+
         }
     }
 
@@ -247,13 +274,21 @@ public class CrimeFragment extends Fragment {
         return report;
     }
 
-    private void updatePhotoView() {
-        if (mPhotoFile == null || !mPhotoFile.exists()) {
-            mPhotoView.setImageDrawable(null);
-        } else {
+    private void initialPhotoView() {
+        for (int i=0; i<getActivity().getResources().getInteger(R.integer.num_pics); i++) {
+            updatePhotoView(i);
+        }
+    }
+
+    private void updatePhotoView(Integer i) {
+        if (mPhotoFileList.get(i) == null || !mPhotoFileList.get(i).exists()) {
+            // make no changes
+        }
+        else {
             Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFile.getPath(), getActivity());
-            mPhotoView.setImageBitmap(bitmap);
+                    mPhotoFileList.get(i).getPath(),
+                    getActivity());
+            mPhotoViewList.get(i).setImageBitmap(bitmap);
         }
     }
 }

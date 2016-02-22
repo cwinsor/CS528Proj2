@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginTop="16dp"
+    android:baselineAligned="false">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/additional_crimes_label"
+        android:id="@+id/textView"
+        />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+
+
+        <ImageView android:id="@+id/crime_photo_1"
+            android:layout_height="50dip"
+            android:layout_width="0dip"
+            android:layout_weight="30"
+            android:cropToPadding="true"
+            android:background="@android:color/darker_gray"
+            android:layout_margin="2dp" />
+
+
+        <ImageView android:id="@+id/crime_photo_2"
+            android:layout_height="50dip"
+            android:layout_width="0dip"
+            android:layout_weight="30"
+            android:cropToPadding="true"
+            android:background="@android:color/darker_gray"
+            android:layout_margin="2dp" />
+
+        <ImageView android:id="@+id/crime_photo_3"
+            android:layout_height="50dip"
+            android:layout_width="0dip"
+            android:layout_weight="30"
+            android:cropToPadding="true"
+            android:background="@android:color/darker_gray"
+            android:layout_margin="2dp" />
+
+    </LinearLayout>
+</LinearLayout>

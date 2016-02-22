@@ -75,15 +75,24 @@ public class CrimeLab {
         }
     }
 
-    public File getPhotoFile(Crime crime) {
+    public File getPhotoFile(Crime crime, Integer photoNum) {
         File externalFilesDir = mContext
                 .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         if (externalFilesDir == null) {
             return null;
         }
+        return new File(externalFilesDir, crime.getPhotoFilename(photoNum));
+    }
 
-        return new File(externalFilesDir, crime.getPhotoFilename());
+    public File getPhotoFileNewPhoto(Crime crime) {
+        File externalFilesDir = mContext
+                .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+        if (externalFilesDir == null) {
+            return null;
+        }
+        return new File(externalFilesDir, crime.getPhotoFilenameBasic());
     }
 
     public void updateCrime(Crime crime) {
