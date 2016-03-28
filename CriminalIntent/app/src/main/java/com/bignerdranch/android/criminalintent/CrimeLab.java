@@ -76,8 +76,7 @@ public class CrimeLab {
     }
 
     public File getPhotoFile(Crime crime, Integer photoNum) {
-        File externalFilesDir = mContext
-                .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File externalFilesDir = mContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         if (externalFilesDir == null) {
             return null;
@@ -85,15 +84,7 @@ public class CrimeLab {
         return new File(externalFilesDir, crime.getPhotoFilename(photoNum));
     }
 
-    public File getPhotoFileNewPhoto(Crime crime) {
-        File externalFilesDir = mContext
-                .getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
-        if (externalFilesDir == null) {
-            return null;
-        }
-        return new File(externalFilesDir, crime.getPhotoFilenameBasic());
-    }
 
     public void updateCrime(Crime crime) {
         String uuidString = crime.getId().toString();

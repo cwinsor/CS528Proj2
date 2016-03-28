@@ -6,15 +6,19 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,13 +30,18 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 
+import com.bignerdranch.android.criminalintent.database.MyStatic;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
 public class CrimeFragment extends Fragment {
+
+    private static final String TAG = "CrimeFragment";
 
     private static final String ARG_CRIME_ID = "crime_id";
     private static final String DIALOG_DATE = "DialogDate";
@@ -43,7 +52,8 @@ public class CrimeFragment extends Fragment {
 
     private Crime mCrime;
     private List<File> mPhotoFileList;
-    private Integer currentPhotoNum = 2;
+
+    private Integer currentPhotoNum = 0;
     private EditText mTitleField;
     private Button mDateButton;
     private CheckBox mSolvedCheckbox;
@@ -51,10 +61,14 @@ public class CrimeFragment extends Fragment {
     private Button mSuspectButton;
     private ImageButton mPhotoButton;
     private final Intent imageIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    private Button mDeleteImagesButton;
 
     private List<ImageView> mPhotoViewList;
 
     public static CrimeFragment newInstance(UUID crimeId) {
+
+        Log.v(TAG, "newInstance");
+
         Bundle args = new Bundle();
         args.putSerializable(ARG_CRIME_ID, crimeId);
 
@@ -66,6 +80,9 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Log.v(TAG, "onCreate");
+
         UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
         mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
 
@@ -80,6 +97,8 @@ public class CrimeFragment extends Fragment {
     public void onPause() {
         super.onPause();
 
+        Log.v(TAG, "onPause");
+
         CrimeLab.get(getActivity())
                 .updateCrime(mCrime);
     }
@@ -87,6 +106,9 @@ public class CrimeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        Log.v(TAG, "--> onCreateView");
+
         View v = inflater.inflate(R.layout.fragment_crime, container, false);
 
         mTitleField = (EditText) v.findViewById(R.id.crime_title);
@@ -167,11 +189,11 @@ public class CrimeFragment extends Fragment {
 
 
         boolean canTakePhoto =
-                (mPhotoFileList.get(0) != null) &&
+              /*  (mPhotoFileList.get(0) != null) &&
                         (mPhotoFileList.get(1) != null) &&
                         (mPhotoFileList.get(2) != null) &&
-                        (mPhotoFileList.get(3) != null) &&
-                        imageIntent.resolveActivity(packageManager) != null;
+                        (mPhotoFileList.get(3) != null) && */
+                imageIntent.resolveActivity(packageManager) != null;
         mPhotoButton.setEnabled(canTakePhoto);
 
         if (canTakePhoto) {
@@ -186,22 +208,39 @@ public class CrimeFragment extends Fragment {
         });
 
         mPhotoViewList = new ArrayList<ImageView>();
-        mPhotoViewList.add(0, (ImageView) v.findViewById( R.id.crime_photo_0));
-        mPhotoViewList.add(1, (ImageView) v.findViewById( R.id.crime_photo_1));
-        mPhotoViewList.add(2, (ImageView) v.findViewById( R.id.crime_photo_2));
-        mPhotoViewList.add(3, (ImageView) v.findViewById( R.id.crime_photo_3));
-        initialPhotoView();
+        mPhotoViewList.add(0, (ImageView) v.findViewById(R.id.crime_photo_0));
+        mPhotoViewList.add(1, (ImageView) v.findViewById(R.id.crime_photo_1));
+        mPhotoViewList.add(2, (ImageView) v.findViewById(R.id.crime_photo_2));
+        mPhotoViewList.add(3, (ImageView) v.findViewById(R.id.crime_photo_3));
 
+        mDeleteImagesButton = (Button)v.findViewById(R.id.delete_button);
+        mDeleteImagesButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+
+                for (int i = 0; i < getActivity().getResources().getInteger(R.integer.num_pics); i++) {
+                    boolean deleted = mPhotoFileList.get(i).delete();
+                    MyStatic.Log(TAG, "...deleted returns " + deleted);
+                }
+                currentPhotoNum = 0;
+                initialPhotoView();
+            }
+        });
+
+        initialPhotoView();
         return v;
     }
 
     private void targetThePhotoIntent() {
         Uri uri = Uri.fromFile(mPhotoFileList.get(currentPhotoNum));
         imageIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+        MyStatic.Log(TAG,"here");
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        Log.v(TAG, "onActivityResult");
+
         if (resultCode != Activity.RESULT_OK) {
             return;
         }
@@ -243,7 +282,7 @@ public class CrimeFragment extends Fragment {
         } else if (requestCode == REQUEST_PHOTO) {
             updatePhotoView(currentPhotoNum);
 
-// point intent to the next photo
+            // point intent to the next photo
             currentPhotoNum = (currentPhotoNum + 1) % getActivity().getResources().getInteger(R.integer.num_pics);
             targetThePhotoIntent();
 
@@ -255,6 +294,9 @@ public class CrimeFragment extends Fragment {
     }
 
     private String getCrimeReport() {
+
+        Log.v(TAG, "getCrimeReport");
+
         String solvedString = null;
         if (mCrime.isSolved()) {
             solvedString = getString(R.string.crime_report_solved);
@@ -281,14 +323,63 @@ public class CrimeFragment extends Fragment {
     }
 
     private void updatePhotoView(Integer i) {
-        if (mPhotoFileList.get(i) == null || !mPhotoFileList.get(i).exists()) {
-            // make no changes
+        if (mPhotoFileList.get(i) == null) {
+            MyStatic.Fatal(TAG, "error 1234 mPhotoFileList has a null");
+        }
+        if (!mPhotoFileList.get(i).exists()) {
+            MyStatic.Log(TAG, "note - file does NOT exist");
+            mPhotoViewList.get(i).setImageBitmap(null);
         }
         else {
-            Bitmap bitmap = PictureUtils.getScaledBitmap(
-                    mPhotoFileList.get(i).getPath(),
-                    getActivity());
-            mPhotoViewList.get(i).setImageBitmap(bitmap);
+            MyStatic.Log(TAG, "note - file exists");
+            String path =  mPhotoFileList.get(i).getPath();
+            FragmentActivity fragmentActivity = getActivity();
+            Bitmap bitmap = PictureUtils.getScaledBitmap(path, fragmentActivity);
+
+            int orientation = -1;
+            try {
+                ExifInterface ei = new ExifInterface(path);
+                 orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+            } catch (IOException ioException) {
+                MyStatic.Fatal(TAG,ioException.toString());
+            }
+          MyStatic.Log(TAG,"orientation = " + orientation);
+            float angle = exifToAngle(orientation);
+            Bitmap bitmap2 = rotateImage(bitmap, angle);
+
+
+
+            mPhotoViewList.get(i).setImageBitmap(bitmap2);
         }
     }
+
+
+    // http://www.programcreek.com/java-api-examples/index.php?api=android.media.ExifInterface
+    // http://stackoverflow.com/questions/14066038/why-image-captured-using-camera-intent-gets-rotated-on-some-devices-in-android
+    public float exifToAngle(int o) {
+
+        if (o == ExifInterface.ORIENTATION_NORMAL) {
+            return 0;
+        } else if (o == ExifInterface.ORIENTATION_ROTATE_90) {
+            return 90;
+        } else if (o == ExifInterface.ORIENTATION_ROTATE_180) {
+            return 180;
+        } else if (o == ExifInterface.ORIENTATION_ROTATE_270) {
+            return 270;
+        } else {
+            return 0;
+        }
+    }
+
+    public static Bitmap rotateImage(Bitmap source, float angle) {
+        Bitmap retVal;
+
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        retVal = Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
+
+        return retVal;
+    }
+
+
 }

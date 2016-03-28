@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +20,8 @@ import java.util.List;
 
 public class CrimeListFragment extends Fragment {
 
+    private static String sMSG = "ZONA ----> CrimeListFragment ";
+
     private static final String SAVED_SUBTITLE_VISIBLE = "subtitle";
 
     private RecyclerView mCrimeRecyclerView;
@@ -28,12 +31,14 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.v(sMSG, "onCreate");
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.v(sMSG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_crime_list, container, false);
 
         mCrimeRecyclerView = (RecyclerView) view
@@ -52,18 +57,21 @@ public class CrimeListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Log.v(sMSG, "onResume");
         updateUI();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+        Log.v(sMSG, "onSaveInstanceState");
         outState.putBoolean(SAVED_SUBTITLE_VISIBLE, mSubtitleVisible);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        Log.v(sMSG, "onCreateOptionsMenu");
         inflater.inflate(R.menu.fragment_crime_list, menu);
 
         MenuItem subtitleItem = menu.findItem(R.id.menu_item_show_subtitle);
@@ -76,6 +84,7 @@ public class CrimeListFragment extends Fragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Log.v(sMSG, "onOptionsItemSelected");
         switch (item.getItemId()) {
             case R.id.menu_item_new_crime:
                 Crime crime = new Crime();
@@ -95,6 +104,7 @@ public class CrimeListFragment extends Fragment {
     }
 
     private void updateSubtitle() {
+        Log.v(sMSG, "updateSubtitle");
         CrimeLab crimeLab = CrimeLab.get(getActivity());
         int crimeCount = crimeLab.getCrimes().size();
         String subtitle = getString(R.string.subtitle_format, crimeCount);
@@ -184,4 +194,38 @@ public class CrimeListFragment extends Fragment {
             mCrimes = crimes;
         }
     }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.v(sMSG, "onStart");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.v(sMSG, "onPause");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.v(sMSG, "onStop");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.v(sMSG, "onDestroyView");
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.v(sMSG, "onDestroy");
+    }
+
+
 }

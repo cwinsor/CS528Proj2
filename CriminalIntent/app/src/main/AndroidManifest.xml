@@ -3,10 +3,10 @@
     package="com.bignerdranch.android.criminalintent" >
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-                     android:maxSdkVersion="18"
+        android:maxSdkVersion="18"
         />
     <uses-feature android:name="android.hardware.camera"
-                  android:required="false"
+        android:required="false"
         />
 
     <application
@@ -20,10 +20,8 @@
             android:parentActivityName=".CrimeListActivity">
         </activity>
         <activity android:name=".CrimeListActivity">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 

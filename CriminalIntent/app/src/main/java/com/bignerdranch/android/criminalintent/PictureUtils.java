@@ -35,6 +35,8 @@ public class PictureUtils {
         options = new BitmapFactory.Options();
         options.inSampleSize = inSampleSize;
 
-        return BitmapFactory.decodeFile(path, options);
+        Bitmap bitmap = BitmapFactory.decodeFile(path, options);
+// zona        return BitmapFactory.decodeFile(path, options);
+return bitmap;
     }
 }

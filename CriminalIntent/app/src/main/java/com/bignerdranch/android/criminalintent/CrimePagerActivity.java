@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +20,8 @@ public class CrimePagerActivity extends AppCompatActivity {
     private ViewPager mViewPager;
     private List<Crime> mCrimes;
 
+    private static String sMSG = "ZONA CrimePagerActivity";
+
     public static Intent newIntent(Context packageContext, UUID crimeId) {
         Intent intent = new Intent(packageContext, CrimePagerActivity.class);
         intent.putExtra(EXTRA_CRIME_ID, crimeId);
@@ -29,6 +32,8 @@ public class CrimePagerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_crime_pager);
+
+        Log.v(sMSG, "onCreate");
 
         UUID crimeId = (UUID) getIntent()
                 .getSerializableExtra(EXTRA_CRIME_ID);
@@ -53,7 +58,8 @@ public class CrimePagerActivity extends AppCompatActivity {
 
         mViewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) { }
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
 
             @Override
             public void onPageSelected(int position) {
@@ -64,7 +70,8 @@ public class CrimePagerActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) { }
+            public void onPageScrollStateChanged(int state) {
+            }
         });
 
         for (int i = 0; i < mCrimes.size(); i++) {
@@ -74,4 +81,25 @@ public class CrimePagerActivity extends AppCompatActivity {
             }
         }
     }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Log.v(sMSG, "onStart");
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v(sMSG, "onResume");
+    }
+
+/*
+    @Override
+    public void onSaveInstatnceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("Integer", currentPhotoNum);
+            }
+  */
+
 }

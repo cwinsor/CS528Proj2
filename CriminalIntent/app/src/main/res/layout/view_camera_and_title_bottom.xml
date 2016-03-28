@@ -24,29 +24,26 @@
 
 
         <ImageView android:id="@+id/crime_photo_1"
-            android:layout_height="50dip"
+            android:layout_height="70dip"
             android:layout_width="0dip"
             android:layout_weight="30"
             android:cropToPadding="true"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="2dp" />
-
+            android:layout_margin="0dp" />
+        <!--            android:background="@android:color/darker_gray" -->
 
         <ImageView android:id="@+id/crime_photo_2"
-            android:layout_height="50dip"
+            android:layout_height="70dip"
             android:layout_width="0dip"
             android:layout_weight="30"
             android:cropToPadding="true"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="2dp" />
+            android:layout_margin="0dp" />
 
         <ImageView android:id="@+id/crime_photo_3"
-            android:layout_height="50dip"
+            android:layout_height="70dip"
             android:layout_width="0dip"
             android:layout_weight="30"
             android:cropToPadding="true"
-            android:background="@android:color/darker_gray"
-            android:layout_margin="2dp" />
+            android:layout_margin="0dp" />
 
     </LinearLayout>
 </LinearLayout>
